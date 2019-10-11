@@ -13,7 +13,7 @@ class Connector extends BasicConnector {
     async start() {
         await super.start({
             serverRoutes: {
-                generateSecret: {
+                'auth.generateSecret': {
                     handler: this._auth.generateSecret,
                     scope: this._auth,
                     validation: {
@@ -25,7 +25,7 @@ class Connector extends BasicConnector {
                         },
                     },
                 },
-                authorize: {
+                'auth.authorize': {
                     handler: this._auth.authorize,
                     scope: this._auth,
                     validation: {
