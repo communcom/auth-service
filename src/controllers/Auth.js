@@ -60,7 +60,7 @@ class Auth extends Basic {
             throw { code: 1103, message: 'Secret verification failed - access denied' };
         }
 
-        const resolvedUserId = await this._resolveNames(`${user}@commun`);
+        const resolvedUserId = await this._resolveUserId(`${user}@commun`);
 
         const publicKeys = await this._getPublicKeyFromBc(resolvedUserId);
 
@@ -90,7 +90,7 @@ class Auth extends Basic {
     }
 
     // TODO use state-reader
-    async _resolveNames(user) {
+    async _resolveUserId(user) {
         try {
             const resolved = await RPC.fetch('/v1/chain/resolve_names', [user]);
             return resolved[0].resolved_username;
