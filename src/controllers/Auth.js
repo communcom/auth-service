@@ -83,8 +83,7 @@ class Auth extends Basic {
             // this field exists in the name of Backward compatibility
             user,
             username: user,
-            resolvedUserId,
-            roles: [],
+            userId: resolvedUserId,
             permission: publicKeysPermission,
         };
     }
