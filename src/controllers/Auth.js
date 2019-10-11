@@ -60,34 +60,33 @@ class Auth extends Basic {
             throw { code: 1103, message: 'Secret verification failed - access denied' };
         }
 
-        try {
-            const resolvedUsername = await this._resolveNames(`${user}@commun`);
+        const resolvedUserId = await this._resolveNames(`${user}@commun`);
 
-            const publicKeys = await this._getPublicKeyFromBc(resolvedUsername);
+        const publicKeys = await this._getPublicKeyFromBc(resolvedUserId);
 
-            const publicKeysPermission = this._verifyKeys({
-                secretBuffer,
-                sign,
-                publicKeys,
-            });
+        const publicKeysPermission = this._verifyKeys({
+            secretBuffer,
+            sign,
+            publicKeys,
+        });
 
-            if (!publicKeysPermission) {
-                Logger.error(
-                    'Public key is not valid',
-                    JSON.stringify({ user, accountName, publicKeysPermission, publicKeys }, null, 2)
-                );
-                throw { code: 1104, message: 'Public key verification failed - access denied' };
-            }
-            this._secretMap.delete(channelId);
-
-            return {
-                user: accountName,
-                roles: [],
-                permission: publicKeysPermission,
-            };
-        } catch (error) {
-            throw error;
+        if (!publicKeysPermission) {
+            Logger.error(
+                'Public key is not valid',
+                JSON.stringify({ user, resolvedUserId, publicKeysPermission, publicKeys }, null, 2)
+            );
+            throw { code: 1104, message: 'Public key verification failed - access denied' };
         }
+        this._secretMap.delete(channelId);
+
+        return {
+            // this field exists in the name of Backward compatibility
+            user,
+            username: user,
+            resolvedUserId,
+            roles: [],
+            permission: publicKeysPermission,
+        };
     }
 
     // TODO use state-reader
