@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 
 const core = require('cyberway-core-service');
 const Basic = core.controllers.Basic;
-const Logger = core.utils.Logger;
+const { Logger } = core.utils;
 
 const { JsonRpc } = require('cyberwayjs');
 const Signature = require('eosjs-ecc/lib/signature');
@@ -126,20 +126,20 @@ class Auth extends Basic {
     }
 
     // TODO use state-reader
-    async _getPublicKeyFromBc(username) {
-        try {
-            const accountData = await RPC.get_account(username);
+    async _getPublicKeyFromBc(userId) {
+        let accountData = null;
 
-            return accountData.permissions.map(permission => {
-                return {
-                    publicKey: convertLegacyPublicKey(permission.required_auth.keys[0].key),
-                    permission: permission.perm_name,
-                };
-            });
+        try {
+            accountData = await RPC.get_account(userId);
         } catch (error) {
-            Logger.error(`Error get_account  -- ${username}`, JSON.stringify(error, null, 4));
-            throw { code: 1107, message: `Cannot get such account from BC: ${username}` };
+            Logger.error(`Error get_account for (${userId}):`, error);
+            throw { code: 1107, message: `Cannot get such account from BC: ${userId}` };
         }
+
+        return accountData.permissions.map(permission => ({
+            publicKey: convertLegacyPublicKey(permission.required_auth.keys[0].key),
+            permission: permission.perm_name,
+        }));
     }
 }
 
