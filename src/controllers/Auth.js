@@ -94,7 +94,7 @@ class Auth extends Basic {
             const resolved = await RPC.fetch('/v1/chain/resolve_names', [user]);
             return resolved[0].resolved_username;
         } catch (error) {
-            Logger.error(`Error resolve_names -- ${user}`, JSON.stringify(error, null, 4));
+            Logger.error(`Error resolve_names for (${user})`, error);
             throw { code: 1105, message: `Can't resolve name: ${user}` };
         }
     }
