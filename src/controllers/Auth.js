@@ -136,10 +136,18 @@ class Auth extends Basic {
             throw { code: 1107, message: `Cannot get such account from BC: ${userId}` };
         }
 
-        return accountData.permissions.map(permission => ({
-            publicKey: convertLegacyPublicKey(permission.required_auth.keys[0].key),
-            permission: permission.perm_name,
-        }));
+        return accountData.permissions.map(permission => {
+            let publicKey = null;
+
+            if (permission.required_auth.keys.length) {
+                publicKey = convertLegacyPublicKey(permission.required_auth.keys[0].key);
+            }
+
+            return {
+                publicKey,
+                permission: permission.perm_name,
+            };
+        });
     }
 }
 
