@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 
 const core = require('cyberway-core-service');
 const Basic = core.controllers.Basic;
-const Logger = core.utils.Logger;
+const { Logger } = core.utils;
 
 const { JsonRpc } = require('cyberwayjs');
 const Signature = require('eosjs-ecc/lib/signature');
@@ -94,7 +94,7 @@ class Auth extends Basic {
             const resolved = await RPC.fetch('/v1/chain/resolve_names', [user]);
             return resolved[0].resolved_username;
         } catch (error) {
-            Logger.error(`Error resolve_names -- ${user}`, JSON.stringify(error, null, 4));
+            Logger.error(`Error resolve_names for (${user})`, error);
             throw { code: 1105, message: `Can't resolve name: ${user}` };
         }
     }
@@ -126,20 +126,28 @@ class Auth extends Basic {
     }
 
     // TODO use state-reader
-    async _getPublicKeyFromBc(username) {
-        try {
-            const accountData = await RPC.get_account(username);
+    async _getPublicKeyFromBc(userId) {
+        let accountData = null;
 
-            return accountData.permissions.map(permission => {
-                return {
-                    publicKey: convertLegacyPublicKey(permission.required_auth.keys[0].key),
-                    permission: permission.perm_name,
-                };
-            });
+        try {
+            accountData = await RPC.get_account(userId);
         } catch (error) {
-            Logger.error(`Error get_account  -- ${username}`, JSON.stringify(error, null, 4));
-            throw { code: 1107, message: `Cannot get such account from BC: ${username}` };
+            Logger.error(`Error get_account for (${userId}):`, error);
+            throw { code: 1107, message: `Cannot get such account from BC: ${userId}` };
         }
+
+        return accountData.permissions.map(permission => {
+            let publicKey = null;
+
+            if (permission.required_auth.keys.length) {
+                publicKey = convertLegacyPublicKey(permission.required_auth.keys[0].key);
+            }
+
+            return {
+                publicKey,
+                permission: permission.perm_name,
+            };
+        });
     }
 }
 
