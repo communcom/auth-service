@@ -48,6 +48,7 @@ class Connector extends BasicConnector {
                 },
                 'auth.getPublicKeys': {
                     handler: this._auth.getPublicKeys,
+                    required: ['userId'],
                     scope: this._auth,
                     validation: {
                         properties: {

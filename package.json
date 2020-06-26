@@ -10,7 +10,7 @@
   "license": "GPL-3.0",
   "description": "auth-service",
   "dependencies": {
-    "cyberway-core-service": "^3.54.3",
+    "cyberway-core-service": "^3.59.3",
     "cyberwayjs": "^20.0.0-beta7",
     "eosjs-ecc": "^4.0.4",
     "node-fetch": "^2.3.0",
