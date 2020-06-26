@@ -146,7 +146,7 @@ class Auth extends Basic {
 
         return accountData.permissions.map(permission => {
             let publicKey = null;
-            
+
             if (permission.required_auth.keys.length) {
                 const key = permission.required_auth.keys[0].key;
                 publicKey = convertLegacyKeys ? convertLegacyPublicKey(key) : key;
