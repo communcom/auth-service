@@ -88,6 +88,14 @@ class Auth extends Basic {
         };
     }
 
+    async getPublicKeys({ userId }) {
+        const publicKeys = await this._getPublicKeyFromBc(userId, false);
+
+        return {
+            publicKeys,
+        };
+    }
+
     // TODO use state-reader
     async _resolveUserId(user) {
         try {
@@ -126,7 +134,7 @@ class Auth extends Basic {
     }
 
     // TODO use state-reader
-    async _getPublicKeyFromBc(userId) {
+    async _getPublicKeyFromBc(userId, convertLegacyKeys = true) {
         let accountData = null;
 
         try {
@@ -138,9 +146,10 @@ class Auth extends Basic {
 
         return accountData.permissions.map(permission => {
             let publicKey = null;
-
+            
             if (permission.required_auth.keys.length) {
-                publicKey = convertLegacyPublicKey(permission.required_auth.keys[0].key);
+                const key = permission.required_auth.keys[0].key;
+                publicKey = convertLegacyKeys ? convertLegacyPublicKey(key) : key;
             }
 
             return {
